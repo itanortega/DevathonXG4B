@@ -1,0 +1,331 @@
+asyncapi: 2.5.0
+channels:
+  /:
+    publish:
+      message:
+        oneOf:
+        - $ref: '#/components/messages/Connect'
+        - $ref: '#/components/messages/Disconnect'
+        - $ref: '#/components/messages/Create_Room'
+        - $ref: '#/components/messages/Join_Room_Request'
+        - $ref: '#/components/messages/Make_Move'
+        - $ref: '#/components/messages/Get_Room_List'
+    subscribe:
+      message:
+        oneOf:
+        - $ref: '#/components/messages/player_left'
+        - $ref: '#/components/messages/room_created'
+        - $ref: '#/components/messages/room_list_update'
+        - $ref: '#/components/messages/join_error'
+        - $ref: '#/components/messages/game_start'
+        - $ref: '#/components/messages/game_state'
+        - $ref: '#/components/messages/room_joined'
+        - $ref: '#/components/messages/invalid_move'
+        - $ref: '#/components/messages/room_list'
+    x-handlers:
+      disconnect: disconnect
+components:
+  messages:
+    Connect:
+      description: ''
+      name: connect
+    Create_Room:
+      description: ''
+      name: create_room
+    Disconnect:
+      description: ''
+      name: disconnect
+    Get_Room_List:
+      description: ''
+      name: get_room_list
+    Join_Room_Request:
+      description: ''
+      name: join_room_request
+      payload:
+        $ref: '#/components/schemas/JoinRoomRequest'
+        deprecated: false
+      x-ack:
+        $ref: '#/components/schemas/NoSpec'
+    Make_Move:
+      description: ''
+      name: make_move
+      payload:
+        $ref: '#/components/schemas/MakeMoveRequest'
+        deprecated: false
+      x-ack:
+        $ref: '#/components/schemas/NoSpec'
+    game_start:
+      description: ''
+      name: game_start
+      payload:
+        $ref: '#/components/schemas/GameStartData'
+        deprecated: false
+    game_state:
+      description: ''
+      name: game_state
+      payload:
+        $ref: '#/components/schemas/GameStateData'
+        deprecated: false
+    invalid_move:
+      description: ''
+      name: invalid_move
+      payload:
+        $ref: '#/components/schemas/InvalidMoveData'
+        deprecated: false
+    join_error:
+      description: ''
+      name: join_error
+      payload:
+        $ref: '#/components/schemas/JoinErrorData'
+        deprecated: false
+    player_left:
+      description: ''
+      name: player_left
+      payload:
+        $ref: '#/components/schemas/PlayerLeftData'
+        deprecated: false
+    room_created:
+      description: ''
+      name: room_created
+      payload:
+        $ref: '#/components/schemas/RoomCreatedData'
+        deprecated: false
+    room_joined:
+      description: ''
+      name: room_joined
+      payload:
+        $ref: '#/components/schemas/RoomJoinedData'
+        deprecated: false
+    room_list:
+      description: ''
+      name: room_list
+      payload:
+        $ref: '#/components/schemas/RoomListData'
+        deprecated: false
+    room_list_update:
+      description: ''
+      name: room_list_update
+      payload:
+        $ref: '#/components/schemas/RoomListUpdateData'
+        deprecated: false
+  schemas:
+    GameStartData:
+      properties:
+        room_id:
+          description: Room ID
+          example: ABC123
+          title: Room Id
+          type: string
+        you_are:
+          description: Your symbol in the game ('X' or 'O')
+          example: X
+          title: You Are
+          type: string
+      required:
+      - room_id
+      - you_are
+      title: GameStartData
+      type: object
+    GameStateData:
+      properties:
+        board:
+          description: Current 3x3 game board state
+          example:
+          - - X
+            - ''
+            - O
+          - - ''
+            - X
+            - ''
+          - - ''
+            - ''
+            - O
+          items:
+            items:
+              type: string
+            type: array
+          title: Board
+          type: array
+        current_turn:
+          example: O
+          title: Current Turn
+          type: string
+        game_over:
+          example: false
+          title: Game Over
+          type: boolean
+        winner:
+          example: X
+          title: Winner
+          type: string
+      required:
+      - board
+      - current_turn
+      - game_over
+      title: GameStateData
+      type: object
+    InvalidMoveData:
+      properties:
+        error:
+          description: Error message
+          example: Invalid move
+          title: Error
+          type: string
+      required:
+      - error
+      title: InvalidMoveData
+      type: object
+    JoinErrorData:
+      properties:
+        error:
+          description: Error message
+          example: Room not found
+          title: Error
+          type: string
+      required:
+      - error
+      title: JoinErrorData
+      type: object
+    JoinRoomRequest:
+      properties:
+        room_id:
+          description: ID of the room to join
+          example: ABC123
+          title: Room Id
+          type: string
+      required:
+      - room_id
+      title: JoinRoomRequest
+      type: object
+    MakeMoveRequest:
+      properties:
+        col:
+          description: Board column (0-2)
+          example: 0
+          maximum: 2
+          minimum: 0
+          title: Col
+          type: integer
+        player:
+          description: Player symbol ('X' or 'O')
+          example: X
+          pattern: ^[XO]$
+          title: Player
+          type: string
+        room_id:
+          description: Room ID
+          example: ABC123
+          title: Room Id
+          type: string
+        row:
+          description: Board row (0-2)
+          example: 1
+          maximum: 2
+          minimum: 0
+          title: Row
+          type: integer
+      required:
+      - room_id
+      - row
+      - col
+      - player
+      title: MakeMoveRequest
+      type: object
+    NoSpec:
+      deprecated: false
+      description: Specification is not provided
+    PlayerLeftData:
+      properties:
+        room_id:
+          description: ID of the affected room
+          title: Room Id
+          type: string
+      required:
+      - room_id
+      title: PlayerLeftData
+      type: object
+    RoomCreatedData:
+      properties:
+        room_id:
+          description: Unique room ID
+          title: Room Id
+          type: string
+      required:
+      - room_id
+      title: RoomCreatedData
+      type: object
+    RoomJoinedData:
+      properties:
+        room_id:
+          description: ID of the joined room
+          example: ABC123
+          title: Room Id
+          type: string
+      required:
+      - room_id
+      title: RoomJoinedData
+      type: object
+    RoomListData:
+      definitions:
+        RoomInfo:
+          properties:
+            player_count:
+              example: 1
+              maximum: 2
+              minimum: 1
+              title: Player Count
+              type: integer
+            room_id:
+              example: ABC123
+              title: Room Id
+              type: string
+          required:
+          - room_id
+          - player_count
+          title: RoomInfo
+          type: object
+      items:
+        $ref: '#/components/schemas/RoomListData/definitions/RoomInfo'
+      title: RoomListData
+      type: array
+    RoomListUpdateData:
+      definitions:
+        RoomInfo:
+          properties:
+            player_count:
+              example: 1
+              maximum: 2
+              minimum: 1
+              title: Player Count
+              type: integer
+            room_id:
+              example: ABC123
+              title: Room Id
+              type: string
+          required:
+          - room_id
+          - player_count
+          title: RoomInfo
+          type: object
+      items:
+        $ref: '#/components/schemas/RoomListUpdateData/definitions/RoomInfo'
+      title: RoomListUpdateData
+      type: array
+info:
+  description: 'Tic-Tac-Toe Game API
+
+    <br/> AsyncAPI currently does not support Socket.IO binding and Web Socket like
+    syntax used for now.
+
+    In order to add support for Socket.IO ACK value, AsyncAPI is extended with with
+    x-ack keyword.
+
+    This documentation should **NOT** be used for generating code due to these limitations.
+
+    '
+  title: Tic-Tac-Toe API
+  version: 1.0.0
+servers:
+  TIC_TAC_TOE_BACKEND:
+    protocol: socketio
+    url: http://localhost:5000
